@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIFTY Notion Widget</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #121a2b;
+      --muted: #93a4c3;
+      --text: #e8eefc;
+      --line: #24304a;
+      --accent: #5eead4;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding: 14px;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .title {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .subtle {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,0.015);
+      min-height: 74px;
+    }
+    .label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .value {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .small-value {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .green { color: var(--green); }
+    .red { color: var(--red); }
+    .amber { color: var(--amber); }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .row:first-of-type { border-top: none; }
+    .hide { display: none !important; }
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+    }
+    .interpret {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .foot {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      padding-top: 4px;
+    }
+    @media (max-width: 720px) {
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title">NIFTY Market Widget</div>
+      <div class="subtle" id="metaLine">Loading...</div>
+    </div>
+
+    <div class="card">
+      <div class="title">Live</div>
+      <div class="grid-2">
+        <div class="metric">
+          <div class="label">Current PCR</div>
+          <div class="value" id="pcr">--</div>
+        </div>
+        <div class="metric">
+          <div class="label">India VIX</div>
+          <div class="value" id="vix">--</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="openingCard">
+      <div class="title">Opening 15-Min Candle</div>
+      <div class="subtle" style="margin-bottom:10px;">Visible only from 9:30 AM to 3:30 PM IST</div>
+      <div class="grid-4">
+        <div class="metric"><div class="label">Open</div><div class="small-value" id="open">--</div></div>
+        <div class="metric"><div class="label">High</div><div class="small-value" id="openHigh">--</div></div>
+        <div class="metric"><div class="label">Low</div><div class="small-value" id="openLow">--</div></div>
+        <div class="metric"><div class="label">Close</div><div class="small-value" id="openClose">--</div></div>
+      </div>
+    </div>
+
+    <div class="card" id="openingClosedCard">
+      <div class="title">Opening 15-Min Candle</div>
+      <div class="small-value amber">Market Closed</div>
+      <div class="subtle">This block is hidden outside 9:30 AM to 3:30 PM IST.</div>
+    </div>
+
+    <div class="card">
+      <div class="title">Daily Reference</div>
+      <div class="subtle" id="dailyMode">Using previous trading day values</div>
+      <div class="row"><div>PDH</div><div class="small-value" id="pdh">--</div></div>
+      <div class="row"><div>PDL</div><div class="small-value" id="pdl">--</div></div>
+      <div class="row"><div>PD Close</div><div class="small-value" id="pdClose">--</div></div>
+      <div class="row"><div>FII Net</div><div class="small-value" id="fiiNet">--</div></div>
+      <div class="row"><div>DII Net</div><div class="small-value" id="diiNet">--</div></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Intraday Snapshots</div>
+      <div class="grid-2" style="margin-bottom:10px;">
+        <div class="metric">
+          <div class="label">11:00 AM</div>
+          <div class="row"><div>NIFTY</div><div id="nifty11">--</div></div>
+          <div class="row"><div>VWAP Mid</div><div id="vwapMid11">--</div></div>
+          <div class="row"><div>VWAP Upper</div><div id="vwapUpper11">--</div></div>
+          <div class="row"><div>VWAP Lower</div><div id="vwapLower11">--</div></div>
+        </div>
+        <div class="metric">
+          <div class="label">1:30 PM</div>
+          <div class="row"><div>NIFTY</div><div id="nifty130">--</div></div>
+          <div class="row"><div>VWAP Mid</div><div id="vwapMid130">--</div></div>
+          <div class="row"><div>VWAP Upper</div><div id="vwapUpper130">--</div></div>
+          <div class="row"><div>VWAP Lower</div><div id="vwapLower130">--</div></div>
+        </div>
+      </div>
+      <div class="subtle">Using standard session VWAP bands.</div>
+    </div>
+
+    <div class="card">
+      <div class="title">Interpretation</div>
+      <div class="interpret" id="interpretation">--</div>
+    </div>
+
+    <div class="foot">Edit the data object in this file first. Later, you can replace it with a JSON feed.</div>
+  </div>
+
+  <script>
+    /*
+      BEGINNER MODE
+      -------------
+      Edit only the values inside the data object below.
+      Once the widget is working in Notion, you can later replace this with API/JSON fetch logic.
+    */
+    const data = {
+      current: {
+        pcr: 1.08,
+        vix: 13.45
+      },
+      opening15m: {
+        open: 22420.35,
+        high: 22478.20,
+        low: 22398.15,
+        close: 22461.80
+      },
+      previousTradingDay: {
+        pdh: 22490.70,
+        pdl: 22296.40,
+        pdClose: 22399.15,
+        fiiNet: "-1,245 Cr",
+        diiNet: "+2,018 Cr"
+      },
+      todayEod: {
+        pdh: "Updating...",
+        pdl: "Updating...",
+        pdClose: "Updating...",
+        fiiNet: "Updating...",
+        diiNet: "Updating..."
+      },
+      snapshots: {
+        "11:00": {
+          nifty: 22486.35,
+          vwapMid: 22441.10,
+          vwapUpper: 22502.45,
+          vwapLower: 22379.75
+        },
+        "13:30": {
+          nifty: 22520.25,
+          vwapMid: 22468.80,
+          vwapUpper: 22542.60,
+          vwapLower: 22395.00
+        }
+      }
+    };
+
+    function getIstNow() {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      }).formatToParts(new Date());
+
+      const pick = type => parts.find(p => p.type === type)?.value;
+      return {
+        year: Number(pick('year')),
+        month: Number(pick('month')),
+        day: Number(pick('day')),
+        hour: Number(pick('hour')),
+        minute: Number(pick('minute')),
+        second: Number(pick('second'))
+      };
+    }
+
+    function formatNumber(value) {
+      if (value === null || value === undefined) return '--';
+      if (typeof value === 'string') return value;
+      if (typeof value === 'number') return value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+      return String(value);
+    }
+
+    function isNumeric(value) {
+      return typeof value === 'number' && !Number.isNaN(value);
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = formatNumber(value);
+    }
+
+    function setColorByNumber(id, value, neutral = false) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('green', 'red', 'amber');
+      if (!isNumeric(value)) {
+        el.classList.add('amber');
+        return;
+      }
+      if (neutral) return;
+      if (value > 0) el.classList.add('green');
+      if (value < 0) el.classList.add('red');
+    }
+
+    function render() {
+      const now = getIstNow();
+      const mins = now.hour * 60 + now.minute;
+      const isSession = mins >= 570 && mins <= 930;   // 9:30 to 15:30
+      const isAfter330 = mins >= 930;                 // 15:30 onward
+
+      document.getElementById('metaLine').textContent =
+        `IST ${String(now.day).padStart(2,'0')}/${String(now.month).padStart(2,'0')}/${now.year} ${String(now.hour).padStart(2,'0')}:${String(now.minute).padStart(2,'0')}:${String(now.second).padStart(2,'0')}`;
+
+      // live
+      setText('pcr', data.current.pcr);
+      setText('vix', data.current.vix);
+      setColorByNumber('pcr', data.current.pcr - 1, true);
+      setColorByNumber('vix', data.current.vix, true);
+
+      // opening block visibility
+      document.getElementById('openingCard').classList.toggle('hide', !isSession);
+      document.getElementById('openingClosedCard').classList.toggle('hide', isSession);
+      setText('open', data.opening15m.open);
+      setText('openHigh', data.opening15m.high);
+      setText('openLow', data.opening15m.low);
+      setText('openClose', data.opening15m.close);
+
+      // daily reference
+      const ref = isAfter330 ? data.todayEod : data.previousTradingDay;
+      document.getElementById('dailyMode').textContent = isAfter330
+        ? 'Using today values from 3:30 PM onward. If source is not updated yet, status stays Updating...'
+        : 'Using previous trading day values before 3:30 PM';
+
+      setText('pdh', ref.pdh);
+      setText('pdl', ref.pdl);
+      setText('pdClose', ref.pdClose);
+      setText('fiiNet', ref.fiiNet);
+      setText('diiNet', ref.diiNet);
+
+      // snapshots
+      setText('nifty11', data.snapshots['11:00'].nifty);
+      setText('vwapMid11', data.snapshots['11:00'].vwapMid);
+      setText('vwapUpper11', data.snapshots['11:00'].vwapUpper);
+      setText('vwapLower11', data.snapshots['11:00'].vwapLower);
+
+      setText('nifty130', data.snapshots['13:30'].nifty);
+      setText('vwapMid130', data.snapshots['13:30'].vwapMid);
+      setText('vwapUpper130', data.snapshots['13:30'].vwapUpper);
+      setText('vwapLower130', data.snapshots['13:30'].vwapLower);
+
+      // interpretation
+      const livePrice = isNumeric(data.snapshots['13:30'].nifty)
+        ? data.snapshots['13:30'].nifty
+        : data.snapshots['11:00'].nifty;
+      const refPdh = ref.pdh;
+      const refPdl = ref.pdl;
+      const pcr = data.current.pcr;
+      const fii = String(ref.fiiNet || '');
+      const dii = String(ref.diiNet || '');
+
+      let structure = 'Inside Range';
+      if (isNumeric(livePrice) && isNumeric(refPdh) && livePrice > refPdh) structure = 'Above PDH';
+      else if (isNumeric(livePrice) && isNumeric(refPdl) && livePrice < refPdl) structure = 'Below PDL';
+
+      let participation = 'Neutral';
+      if (isNumeric(pcr) && pcr > 1.2) participation = 'Bullish';
+      else if (isNumeric(pcr) && pcr < 0.8) participation = 'Bearish';
+
+      let flow = 'Updating';
+      if (!fii.includes('Updating') && !dii.includes('Updating')) {
+        flow = `FII ${fii} | DII ${dii}`;
+      }
+
+      let vwapRead = 'Mixed';
+      const n11 = data.snapshots['11:00'].nifty;
+      const m11 = data.snapshots['11:00'].vwapMid;
+      const n130 = data.snapshots['13:30'].nifty;
+      const m130 = data.snapshots['13:30'].vwapMid;
+      if (isNumeric(n11) && isNumeric(m11) && isNumeric(n130) && isNumeric(m130)) {
+        if (n11 > m11 && n130 > m130) vwapRead = 'Above VWAP at both checkpoints';
+        else if (n11 < m11 && n130 < m130) vwapRead = 'Below VWAP at both checkpoints';
+        else if (n11 > m11 && n130 < m130) vwapRead = 'Morning strength weakened by 1:30 PM';
+        else if (n11 < m11 && n130 > m130) vwapRead = 'Morning weakness reversed by 1:30 PM';
+      }
+
+      document.getElementById('interpretation').innerHTML =
+        `<strong>Structure:</strong> ${structure}<br>` +
+        `<strong>Participation:</strong> ${participation} (PCR)<br>` +
+        `<strong>Volatility:</strong> India VIX ${formatNumber(data.current.vix)}<br>` +
+        `<strong>VWAP Read:</strong> ${vwapRead}<br>` +
+        `<strong>Flow:</strong> ${flow}`;
+    }
+
+    render();
+    setInterval(render, 1000);
+  </script>
+</body>
+</html>
