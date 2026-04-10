@@ -3,386 +3,847 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NIFTY Notion Widget</title>
+  <title>NIFTY Decision Engine Widget</title>
   <style>
-    :root {
-      --bg: #0b1220;
-      --card: #121a2b;
-      --muted: #93a4c3;
-      --text: #e8eefc;
-      --line: #24304a;
-      --accent: #5eead4;
-      --green: #22c55e;
-      --red: #ef4444;
-      --amber: #f59e0b;
+    :root{
+      --bg:#0b1220;
+      --card:#121a2b;
+      --muted:#93a4c3;
+      --text:#eef4ff;
+      --accent:#59c3ff;
+      --green:#35d07f;
+      --red:#ff6b6b;
+      --amber:#ffcc66;
+      --border:#24324d;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      padding: 14px;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      padding:16px;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
     }
-    .wrap {
-      max-width: 760px;
-      margin: 0 auto;
-      display: grid;
-      gap: 12px;
+    .wrap{
+      max-width:780px;
+      margin:0 auto;
+      display:grid;
+      gap:12px;
     }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    .card{
+      background:linear-gradient(180deg, rgba(18,26,43,0.98), rgba(14,22,37,0.98));
+      border:1px solid var(--border);
+      border-left:6px solid #24324d;
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 10px 24px rgba(0,0,0,.22);
     }
-    .title {
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 10px;
-      font-weight: 700;
+    .title{
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--accent);
+      margin-bottom:12px;
+      font-weight:800;
     }
-    .subtle {
-      color: var(--muted);
-      font-size: 12px;
+    .value{font-size:18px;font-weight:800}
+    .muted{color:var(--muted)}
+    .grid-2{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:14px;
     }
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#0f1728;
+      font-size:12px;
+      margin:4px 6px 0 0;
     }
-    .metric {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      background: rgba(255,255,255,0.015);
-      min-height: 74px;
+    .green{color:var(--green)}
+    .red{color:var(--red)}
+    .amber{color:var(--amber)}
+    .row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      align-items:center;
+      column-gap:18px;
+      padding:9px 0;
+      border-bottom:1px solid rgba(255,255,255,.05);
     }
-    .label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 8px;
+    .row span{
+      color:#c8d4ea;
+      padding-right:10px;
     }
-    .value {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1.1;
+    .row strong{
+      text-align:right;
+      min-width:190px;
     }
-    .small-value {
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1.2;
+    .decision{
+      font-size:24px;
+      font-weight:900;
+      line-height:1.25;
+      margin-bottom:8px;
     }
-    .green { color: var(--green); }
-    .red { color: var(--red); }
-    .amber { color: var(--amber); }
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      border-top: 1px solid rgba(255,255,255,0.05);
+    .sub{
+      font-size:14px;
+      color:var(--muted);
+      line-height:1.45;
     }
-    .row:first-of-type { border-top: none; }
-    .hide { display: none !important; }
-    .pill {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      background: rgba(255,255,255,0.03);
+    .small{font-size:12px}
+    .mono{font-family:Consolas, monospace}
+    .status-bull{
+      color:var(--green);
+      font-weight:800;
     }
-    .interpret {
-      font-size: 14px;
-      line-height: 1.6;
+    .status-bear{
+      color:var(--red);
+      font-weight:800;
     }
-    .foot {
-      font-size: 11px;
-      color: var(--muted);
-      text-align: center;
-      padding-top: 4px;
+    .status-warn{
+      color:var(--amber);
+      font-weight:800;
     }
-    @media (max-width: 720px) {
-      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .hero-badge{
+      border:1px solid var(--border);
+      background:#0f1728;
+      border-radius:14px;
+      padding:10px 12px;
+      min-width:180px;
+    }
+    .hero-badge .k{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:4px;
+    }
+    .hero-badge .v{
+      font-size:18px;
+      font-weight:800;
+    }
+    .decision-banner{
+      background:linear-gradient(90deg, rgba(89,195,255,.16), rgba(53,208,127,.10));
+      border:1px solid rgba(89,195,255,.22);
+      border-left:8px solid var(--accent);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 12px 28px rgba(0,0,0,.24);
+    }
+    .decision-banner.bull{
+      border-left-color:var(--green);
+      background:linear-gradient(90deg, rgba(53,208,127,.18), rgba(89,195,255,.08));
+    }
+    .decision-banner.bear{
+      border-left-color:var(--red);
+      background:linear-gradient(90deg, rgba(255,107,107,.18), rgba(89,195,255,.06));
+    }
+    .decision-banner.warn{
+      border-left-color:var(--amber);
+      background:linear-gradient(90deg, rgba(255,204,102,.16), rgba(89,195,255,.06));
+    }
+    .compact-table{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+    .compact-row{
+      display:grid;
+      grid-template-columns: 1fr;
+      align-items:start;
+      gap:6px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.06);
+      border-left:5px solid #24324d;
+      border-radius:12px;
+      background:rgba(8,14,26,.35);
+      min-width:0;
+    }
+    .compact-row .k{
+      color:#9fb2d4;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-weight:700;
+      line-height:1.25;
+    }
+    .compact-row .v{
+      text-align:left;
+      font-weight:800;
+      font-size:14px;
+      line-height:1.3;
+      white-space:normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+    .signal-bull{
+      border-left-color: var(--green) !important;
+    }
+    .signal-bear{
+      border-left-color: var(--red) !important;
+    }
+    .signal-warn{
+      border-left-color: var(--amber) !important;
+    }
+
+    @media (max-width: 980px){
+      .compact-table{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+    @media (max-width: 720px){
+      .grid-2,.grid-3,.compact-table{
+        grid-template-columns:1fr;
+      }
+      .row{
+        grid-template-columns:1fr;
+        row-gap:4px;
+      }
+      .row strong{
+        text-align:left;
+        min-width:0;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <div class="title">NIFTY Market Widget</div>
-      <div class="subtle" id="metaLine">Loading...</div>
+    <div id="decisionBanner" class="decision-banner">
+      <div class="title">Final Decision Engine</div>
+      <div class="hero">
+        <div>
+          <div id="decision" class="decision">Loading...</div>
+          <div id="decisionSub" class="sub">Evaluating structure, VWAP, PD range, opening range and liquidity behavior.</div>
+          <div id="tags"></div>
+        </div>
+        <div class="hero-badge">
+          <div class="k">Active Bias</div>
+          <div id="heroBias" class="v">--</div>
+        </div>
+      </div>
     </div>
 
     <div class="card">
       <div class="title">Live</div>
       <div class="grid-2">
-        <div class="metric">
-          <div class="label">Current PCR</div>
-          <div class="value" id="pcr">--</div>
+        <div>
+          <div class="muted small">Current PCR</div>
+          <div id="pcr" class="value">--</div>
         </div>
-        <div class="metric">
-          <div class="label">India VIX</div>
-          <div class="value" id="vix">--</div>
+        <div>
+          <div class="muted small">India VIX</div>
+          <div id="vix" class="value">--</div>
         </div>
       </div>
     </div>
 
     <div class="card" id="openingCard">
-      <div class="title">Opening 15-Min Candle</div>
-      <div class="subtle" style="margin-bottom:10px;">Visible only from 9:30 AM to 3:30 PM IST</div>
-      <div class="grid-4">
-        <div class="metric"><div class="label">Open</div><div class="small-value" id="open">--</div></div>
-        <div class="metric"><div class="label">High</div><div class="small-value" id="openHigh">--</div></div>
-        <div class="metric"><div class="label">Low</div><div class="small-value" id="openLow">--</div></div>
-        <div class="metric"><div class="label">Close</div><div class="small-value" id="openClose">--</div></div>
+      <div class="title">Opening 15m Candle (Visible 9:30 AM–3:30 PM IST)</div>
+      <div id="openingContent" class="grid-2"></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Reference Block</div>
+      <div class="grid-2">
+        <div>
+          <div class="row"><span>PDH</span><strong id="pdh">--</strong></div>
+          <div class="row"><span>PDL</span><strong id="pdl">--</strong></div>
+          <div class="row"><span>PD Close</span><strong id="pdClose">--</strong></div>
+        </div>
+        <div>
+          <div class="row"><span>FII Net</span><strong id="fii">--</strong></div>
+          <div class="row"><span>DII Net</span><strong id="dii">--</strong></div>
+          <div class="row"><span>Reference Date</span><strong id="refDate">--</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title">VWAP Snapshots</div>
+      <div class="grid-2">
+        <div id="snap11"></div>
+        <div id="snap130"></div>
       </div>
     </div>
 
-    <div class="card" id="openingClosedCard">
-      <div class="title">Opening 15-Min Candle</div>
-      <div class="small-value amber">Market Closed</div>
-      <div class="subtle">This block is hidden outside 9:30 AM to 3:30 PM IST.</div>
+    <div class="card">
+      <div class="title">Market Context</div>
+      <div class="compact-table">
+        <div id="rowPdRange" class="compact-row"><div class="k">PD Range Position</div><div id="pdRangePos" class="v">--</div></div>
+        <div id="rowOpeningRange" class="compact-row"><div class="k">Opening Range Position</div><div id="openingRangePos" class="v">--</div></div>
+        <div id="rowOpeningStatus" class="compact-row"><div class="k">Opening Range Status</div><div id="openingRangeStatus" class="v">--</div></div>
+        <div id="rowVwap" class="compact-row"><div class="k">VWAP Position</div><div id="vwapPos" class="v">--</div></div>
+        <div id="rowPdhStatus" class="compact-row"><div class="k">PDH Status</div><div id="pdhStatus" class="v">--</div></div>
+        <div id="rowPdlStatus" class="compact-row"><div class="k">PDL Status</div><div id="pdlStatus" class="v">--</div></div>
+        <div id="rowOchStatus" class="compact-row"><div class="k">Opening High Status</div><div id="ochStatus" class="v">--</div></div>
+        <div id="rowOclStatus" class="compact-row"><div class="k">Opening Low Status</div><div id="oclStatus" class="v">--</div></div>
+        <div id="rowBias" class="compact-row"><div class="k">Bias</div><div id="bias" class="v">--</div></div>
+      </div>
     </div>
 
     <div class="card">
-      <div class="title">Daily Reference</div>
-      <div class="subtle" id="dailyMode">Using previous trading day values</div>
-      <div class="row"><div>PDH</div><div class="small-value" id="pdh">--</div></div>
-      <div class="row"><div>PDL</div><div class="small-value" id="pdl">--</div></div>
-      <div class="row"><div>PD Close</div><div class="small-value" id="pdClose">--</div></div>
-      <div class="row"><div>FII Net</div><div class="small-value" id="fiiNet">--</div></div>
-      <div class="row"><div>DII Net</div><div class="small-value" id="diiNet">--</div></div>
+      <div class="title">Liquidity Engine</div>
+      <div class="compact-table">
+        <div id="rowPdhLiquidity" class="compact-row"><div class="k">PDH Liquidity</div><div id="pdhLiquidity" class="v">--</div></div>
+        <div class="compact-row"><div class="k">PDH Grab Time</div><div id="pdhGrabTime" class="v">--</div></div>
+        <div id="rowPdlLiquidity" class="compact-row"><div class="k">PDL Liquidity</div><div id="pdlLiquidity" class="v">--</div></div>
+        <div class="compact-row"><div class="k">PDL Grab Time</div><div id="pdlGrabTime" class="v">--</div></div>
+        <div id="rowOchLiquidity" class="compact-row"><div class="k">Opening High Liquidity</div><div id="ochLiquidity" class="v">--</div></div>
+        <div class="compact-row"><div class="k">Opening High Grab Time</div><div id="ochGrabTime" class="v">--</div></div>
+        <div id="rowOclLiquidity" class="compact-row"><div class="k">Opening Low Liquidity</div><div id="oclLiquidity" class="v">--</div></div>
+        <div class="compact-row"><div class="k">Opening Low Grab Time</div><div id="oclGrabTime" class="v">--</div></div>
+      </div>
     </div>
 
     <div class="card">
-      <div class="title">Intraday Snapshots</div>
-      <div class="grid-2" style="margin-bottom:10px;">
-        <div class="metric">
-          <div class="label">11:00 AM</div>
-          <div class="row"><div>NIFTY</div><div id="nifty11">--</div></div>
-          <div class="row"><div>VWAP Mid</div><div id="vwapMid11">--</div></div>
-          <div class="row"><div>VWAP Upper</div><div id="vwapUpper11">--</div></div>
-          <div class="row"><div>VWAP Lower</div><div id="vwapLower11">--</div></div>
+      <div class="title">Structure Engine (9:30–11:00, 5m)</div>
+      <div class="grid-3">
+        <div>
+          <div class="muted small">Biggest Candle Body</div>
+          <div id="bigCandle" class="value">--</div>
         </div>
-        <div class="metric">
-          <div class="label">1:30 PM</div>
-          <div class="row"><div>NIFTY</div><div id="nifty130">--</div></div>
-          <div class="row"><div>VWAP Mid</div><div id="vwapMid130">--</div></div>
-          <div class="row"><div>VWAP Upper</div><div id="vwapUpper130">--</div></div>
-          <div class="row"><div>VWAP Lower</div><div id="vwapLower130">--</div></div>
+        <div>
+          <div class="muted small">Next Candle Same Colour?</div>
+          <div id="sameColor" class="value">--</div>
+        </div>
+        <div>
+          <div class="muted small">Overlap &gt; 4?</div>
+          <div id="overlap" class="value">--</div>
         </div>
       </div>
-      <div class="subtle">Using standard session VWAP bands.</div>
     </div>
 
     <div class="card">
-      <div class="title">Interpretation</div>
-      <div class="interpret" id="interpretation">--</div>
+      <div class="title">Level Triggers</div>
+      <div class="compact-table">
+        <div id="rowPdhTrigger" class="compact-row"><div class="k">PDH</div><div id="pdhTrigger" class="v">--</div></div>
+        <div id="rowPdlTrigger" class="compact-row"><div class="k">PDL</div><div id="pdlTrigger" class="v">--</div></div>
+        <div id="rowOchTrigger" class="compact-row"><div class="k">Opening High</div><div id="ochTrigger" class="v">--</div></div>
+        <div id="rowOclTrigger" class="compact-row"><div class="k">Opening Low</div><div id="oclTrigger" class="v">--</div></div>
+      </div>
     </div>
 
-    <div class="foot">Edit the data object in this file first. Later, you can replace it with a JSON feed.</div>
+    <div class="card">
+      <div class="title">How To Update</div>
+      <div class="sub small">
+        Edit the <span class="mono">const data = { ... }</span> block inside this file, then replace GitHub <span class="mono">index.html</span> with the new file.
+      </div>
+    </div>
   </div>
 
-  <script>
-    /*
-      BEGINNER MODE
-      -------------
-      Edit only the values inside the data object below.
-      Once the widget is working in Notion, you can later replace this with API/JSON fetch logic.
-    */
-    const data = {
-      current: {
-        pcr: 1.08,
-        vix: 13.45
-      },
-      opening15m: {
-        open: 22420.35,
-        high: 22478.20,
-        low: 22398.15,
-        close: 22461.80
-      },
-      previousTradingDay: {
-        pdh: 22490.70,
-        pdl: 22296.40,
-        pdClose: 22399.15,
-        fiiNet: "-1,245 Cr",
-        diiNet: "+2,018 Cr"
-      },
-      todayEod: {
-        pdh: "Updating...",
-        pdl: "Updating...",
-        pdClose: "Updating...",
-        fiiNet: "Updating...",
-        diiNet: "Updating..."
-      },
-      snapshots: {
-        "11:00": {
-          nifty: 22486.35,
-          vwapMid: 22441.10,
-          vwapUpper: 22502.45,
-          vwapLower: 22379.75
-        },
-        "13:30": {
-          nifty: 22520.25,
-          vwapMid: 22468.80,
-          vwapUpper: 22542.60,
-          vwapLower: 22395.00
-        }
-      }
+<script>
+function getISTDateObj() {
+  const now = new Date();
+  const istString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+  return new Date(istString);
+}
+function getISTMinutes() {
+  const d = getISTDateObj();
+  return d.getHours() * 60 + d.getMinutes();
+}
+function fmtNum(v) {
+  if (v === null || v === undefined || v === "") return "--";
+  if (typeof v === "string") return v;
+  return Number(v).toLocaleString("en-IN");
+}
+function fmtTime(v) {
+  return v || "--";
+}
+function asDir(open, close) {
+  if (close > open) return "Green";
+  if (close < open) return "Red";
+  return "Doji";
+}
+function classifyBandPosition(price, mid, upper, lower) {
+  if (price >= upper) return "At / Above Upper Band";
+  if (price <= lower) return "At / Below Lower Band";
+  if (price >= mid) return "Above VWAP Mid";
+  return "Below VWAP Mid";
+}
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+function makeSnapshotHTML(label, obj, visible) {
+  if (!visible) {
+    return `
+      <div class="muted"><strong>${label}</strong><br>Not available yet</div>
+    `;
+  }
+  return `
+    <div>
+      <div class="muted small">${label}</div>
+      <div class="row"><span>NIFTY</span><strong>${fmtNum(obj.nifty)}</strong></div>
+      <div class="row"><span>VWAP Mid</span><strong>${fmtNum(obj.vwapMid)}</strong></div>
+      <div class="row"><span>VWAP Upper</span><strong>${fmtNum(obj.vwapUpper)}</strong></div>
+      <div class="row"><span>VWAP Lower</span><strong>${fmtNum(obj.vwapLower)}</strong></div>
+    </div>
+  `;
+}
+
+/*
+  Replace these numbers daily.
+  This file is designed as a clean GitHub/Notion widget shell.
+*/
+const data = {
+  current: {
+    pcr: 1.08,
+    vix: 14.25,
+    currentPrice: 22485
+  },
+
+  opening15m: {
+    open: 22390,
+    high: 22435,
+    low: 22372,
+    close: 22412
+  },
+
+  previousTradingDay: {
+    label: "Previous Day",
+    date: "2026-04-09",
+    pdh: 22420,
+    pdl: 22195,
+    pdClose: 22340,
+    fii: "-₹1,240 Cr",
+    dii: "₹980 Cr"
+  },
+
+  todayEod: {
+    label: "Today",
+    date: "2026-04-10",
+    pdh: "Updating...",
+    pdl: "Updating...",
+    pdClose: "Updating...",
+    fii: "Updating...",
+    dii: "Updating..."
+  },
+
+  snapshots: {
+    "11:00": {
+      nifty: 22462,
+      vwapMid: 22418,
+      vwapUpper: 22470,
+      vwapLower: 22366
+    },
+    "13:30": {
+      nifty: 22505,
+      vwapMid: 22440,
+      vwapUpper: 22502,
+      vwapLower: 22378
+    }
+  },
+
+  structureCandles930to1100: [
+    {time:"09:30", open:22390, high:22410, low:22380, close:22405},
+    {time:"09:35", open:22405, high:22418, low:22398, close:22400},
+    {time:"09:40", open:22400, high:22422, low:22394, close:22418},
+    {time:"09:45", open:22418, high:22435, low:22408, close:22428},
+    {time:"09:50", open:22428, high:22440, low:22420, close:22422},
+    {time:"09:55", open:22422, high:22432, low:22410, close:22412},
+    {time:"10:00", open:22412, high:22426, low:22398, close:22405},
+    {time:"10:05", open:22405, high:22415, low:22392, close:22402},
+    {time:"10:10", open:22402, high:22430, low:22399, close:22424},
+    {time:"10:15", open:22424, high:22445, low:22420, close:22439},
+    {time:"10:20", open:22439, high:22448, low:22428, close:22434},
+    {time:"10:25", open:22434, high:22452, low:22432, close:22446},
+    {time:"10:30", open:22446, high:22458, low:22440, close:22443},
+    {time:"10:35", open:22443, high:22455, low:22435, close:22437},
+    {time:"10:40", open:22437, high:22449, low:22430, close:22433},
+    {time:"10:45", open:22433, high:22446, low:22425, close:22441},
+    {time:"10:50", open:22441, high:22460, low:22436, close:22456},
+    {time:"10:55", open:22456, high:22466, low:22448, close:22462}
+  ]
+};
+
+function getReferenceData() {
+  const mins = getISTMinutes();
+  return mins >= 930 ? data.todayEod : data.previousTradingDay; // 3:30 PM switch
+}
+
+function getOpeningRangePosition(price, opening) {
+  if (price > opening.high) return "Above Opening High";
+  if (price < opening.low) return "Below Opening Low";
+  return "Inside Opening Range";
+}
+
+function getPdRangePosition(price, ref) {
+  const pdh = Number(ref.pdh);
+  const pdl = Number(ref.pdl);
+  if (!Number.isFinite(pdh) || !Number.isFinite(pdl)) return "Updating...";
+  if (price > pdh) return "Above PDH";
+  if (price < pdl) return "Below PDL";
+  return "Inside PD Range";
+}
+
+function getVwapPosition(price, snap130, snap11) {
+  const snap = snap130 && Number.isFinite(Number(snap130.vwapMid)) ? snap130 : snap11;
+  if (!snap) return "Updating...";
+  return classifyBandPosition(price, Number(snap.vwapMid), Number(snap.vwapUpper), Number(snap.vwapLower));
+}
+
+function levelConfirmation(candles, level, direction) {
+  let weakTime = null;
+  let strongTime = null;
+
+  for (let i = 0; i < candles.length; i++) {
+    const c = candles[i];
+    const beyond = direction === "above" ? c.close > level : c.close < level;
+    if (beyond && !weakTime) weakTime = c.time;
+    if (i < candles.length - 1) {
+      const c2 = candles[i + 1];
+      const beyond2 = direction === "above" ? c2.close > level : c2.close < level;
+      if (beyond && beyond2 && !strongTime) strongTime = c2.time;
+    }
+  }
+
+  if (strongTime) return {status: "Strong Confirmation", time: strongTime};
+  if (weakTime) return {status: "Weak Confirmation", time: weakTime};
+  return {status: "Not Confirmed", time: "--"};
+}
+
+function liquidityStatus(candles, level, side, threshold) {
+  // side = "PDH" or "PDL"
+  for (let i = 0; i < candles.length; i++) {
+    const c = candles[i];
+    const validGrab = side === "PDH" ? c.high >= level + threshold : c.low <= level - threshold;
+    if (!validGrab) continue;
+
+    const extreme = side === "PDH" ? c.high : c.low;
+    const next2 = candles.slice(i + 1, i + 3);
+    const next35 = candles.slice(i + 3, i + 6);
+
+    const immediate = side === "PDH"
+      ? next2.some(x => x.high > extreme)
+      : next2.some(x => x.low < extreme);
+
+    if (immediate) return {status: "Immediate Continuation", time: c.time};
+
+    const delayed = side === "PDH"
+      ? next35.some(x => x.high > extreme)
+      : next35.some(x => x.low < extreme);
+
+    if (delayed) return {status: "Delayed Continuation", time: c.time};
+
+    return {status: "Failure", time: c.time};
+  }
+  return {status: "None", time: "--"};
+}
+
+function triggerLine(result) {
+  if (result.status === "Not Confirmed") return "No";
+  return result.status + " at " + result.time;
+}
+
+function computeStructureEngine(candles) {
+  let maxBody = 0;
+  let sameColor = "No";
+  let overlapCount = 0;
+
+  candles.forEach(c => {
+    const body = Math.abs(c.close - c.open);
+    if (body > maxBody) maxBody = body;
+  });
+
+  for (let i = 0; i < candles.length - 1; i++) {
+    const currColor = asDir(candles[i].open, candles[i].close);
+    const nextColor = asDir(candles[i+1].open, candles[i+1].close);
+    if (currColor !== "Doji" && currColor === nextColor) {
+      sameColor = "Yes";
+      break;
+    }
+  }
+
+  for (let i = 0; i < candles.length - 1; i++) {
+    const c1 = candles[i], c2 = candles[i+1];
+    if (c1.high >= c2.low && c1.low <= c2.high) overlapCount++;
+  }
+
+  return {
+    maxBody,
+    sameColor,
+    overlap: overlapCount > 4 ? "Yes" : "No"
+  };
+}
+
+
+function getOpeningRangeStatus(currentPrice, opening, ochConfirm, oclConfirm) {
+  const aboveHigh = currentPrice > opening.high;
+  const belowLow = currentPrice < opening.low;
+
+  if (aboveHigh && ochConfirm.status === "Strong Confirmation") return "Bullish Expansion";
+  if (belowLow && oclConfirm.status === "Strong Confirmation") return "Bearish Expansion";
+  if (ochConfirm.status !== "Not Confirmed" && !aboveHigh) return "Failed Breakout";
+  if (oclConfirm.status !== "Not Confirmed" && !belowLow) return "Failed Breakdown";
+  return "Inside Range";
+}
+
+function buildDecisionEngine(ctx) {
+  const bullishStack =
+    (ctx.pdRangePos === "Above PDH") &&
+    (ctx.openingRangePos === "Above Opening High") &&
+    (ctx.openingRangeStatus === "Bullish Expansion") &&
+    (ctx.vwapPos.includes("Above")) &&
+    (ctx.pdhConfirm.status === "Strong Confirmation") &&
+    (ctx.ochLiquidity.status === "Immediate Continuation" || ctx.ochLiquidity.status === "Delayed Continuation");
+
+  const bearishStack =
+    (ctx.pdRangePos === "Below PDL") &&
+    (ctx.openingRangePos === "Below Opening Low") &&
+    (ctx.openingRangeStatus === "Bearish Expansion") &&
+    (ctx.vwapPos.includes("Below")) &&
+    (ctx.pdlConfirm.status === "Strong Confirmation") &&
+    (ctx.oclLiquidity.status === "Immediate Continuation" || ctx.oclLiquidity.status === "Delayed Continuation");
+
+  const failedBreakout =
+    (ctx.pdhLiquidity.status === "Failure" || ctx.ochLiquidity.status === "Failure" || ctx.openingRangeStatus === "Failed Breakout") &&
+    (ctx.vwapPos.includes("Below") || ctx.pdRangePos === "Inside PD Range");
+
+  const failedBreakdown =
+    (ctx.pdlLiquidity.status === "Failure" || ctx.oclLiquidity.status === "Failure" || ctx.openingRangeStatus === "Failed Breakdown") &&
+    (ctx.vwapPos.includes("Above") || ctx.pdRangePos === "Inside PD Range");
+
+  const rangeChop =
+    (ctx.pdRangePos === "Inside PD Range") &&
+    (ctx.openingRangePos === "Inside Opening Range") &&
+    (ctx.openingRangeStatus === "Inside Range") &&
+    (ctx.ochLiquidity.status === "None") &&
+    (ctx.oclLiquidity.status === "None");
+
+  if (bullishStack) {
+    return {
+      decision: "Bullish Acceptance",
+      sub: "Above PDH, above opening range, opening bullish expansion, opening-high liquidity continued, and above VWAP with strong confirmation.",
+      tags: ["Trend Continuation", "PDH Accepted", "Opening Liquidity OK", "VWAP Support"]
     };
+  }
+  if (bearishStack) {
+    return {
+      decision: "Bearish Acceptance",
+      sub: "Below PDL, below opening range, opening bearish expansion, opening-low liquidity continued, and below VWAP with strong confirmation.",
+      tags: ["Trend Continuation", "PDL Accepted", "Opening Liquidity OK", "VWAP Pressure"]
+    };
+  }
+  if (failedBreakout) {
+    return {
+      decision: "Failed Breakout / Reversal Risk",
+      sub: "Breakout quality is weak. PDH or opening-high liquidity failed, or opening breakout was not accepted above context.",
+      tags: ["Reversal Risk", "Failed Breakout", "Opening Trap"]
+    };
+  }
+  if (failedBreakdown) {
+    return {
+      decision: "Failed Breakdown / Reversal Risk",
+      sub: "Breakdown quality is weak. PDL or opening-low liquidity failed, or opening breakdown was not accepted below context.",
+      tags: ["Reversal Risk", "Failed Breakdown", "Opening Trap"]
+    };
+  }
+  if (rangeChop) {
+    return {
+      decision: "Range-Chop",
+      sub: "Price is inside previous-day range and opening range, with no accepted opening liquidity continuation. Directional conviction is low.",
+      tags: ["Mean Reversion", "Low Conviction", "Wait"]
+    };
+  }
+  return {
+    decision: "Mixed Context",
+    sub: "Market structure is not aligned across PD range, opening range status, opening liquidity and VWAP.",
+    tags: ["Context Conflict", "Selective", "Patience"]
+  };
+}
 
-    function getIstNow() {
-      const parts = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Asia/Kolkata',
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: false
-      }).formatToParts(new Date());
 
-      const pick = type => parts.find(p => p.type === type)?.value;
-      return {
-        year: Number(pick('year')),
-        month: Number(pick('month')),
-        day: Number(pick('day')),
-        hour: Number(pick('hour')),
-        minute: Number(pick('minute')),
-        second: Number(pick('second'))
-      };
-    }
+function badgeClass(text) {
+  const t = String(text || "").toLowerCase();
+  if (t.includes("bull") || t.includes("above") || t.includes("acceptance") || t.includes("immediate")) return "status-bull";
+  if (t.includes("bear") || t.includes("below") || t.includes("failure") || t.includes("failed")) return "status-bear";
+  if (t.includes("range") || t.includes("mixed") || t.includes("delayed") || t.includes("updating")) return "status-warn";
+  return "";
+}
+function decorateRowValue(id, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = badgeClass(text);
+}
 
-    function formatNumber(value) {
-      if (value === null || value === undefined) return '--';
-      if (typeof value === 'string') return value;
-      if (typeof value === 'number') return value.toLocaleString('en-IN', { maximumFractionDigits: 2 });
-      return String(value);
-    }
 
-    function isNumeric(value) {
-      return typeof value === 'number' && !Number.isNaN(value);
-    }
+function applySignalClass(rowId, text) {
+  const el = document.getElementById(rowId);
+  if (!el) return;
+  el.classList.remove("signal-bull","signal-bear","signal-warn");
+  const cls = badgeClass(text);
+  if (cls === "status-bull") el.classList.add("signal-bull");
+  else if (cls === "status-bear") el.classList.add("signal-bear");
+  else if (cls === "status-warn") el.classList.add("signal-warn");
+}
+function setDecisionBanner(decisionText) {
+  const el = document.getElementById("decisionBanner");
+  if (!el) return;
+  el.classList.remove("bull","bear","warn");
+  const t = String(decisionText || "").toLowerCase();
+  if (t.includes("bull")) el.classList.add("bull");
+  else if (t.includes("bear") || t.includes("failed breakout") || t.includes("failed breakdown")) el.classList.add("bear");
+  else el.classList.add("warn");
+}
 
-    function setText(id, value) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = formatNumber(value);
-    }
+function render() {
+  const mins = getISTMinutes();
+  const isOpeningVisible = mins >= 570 && mins <= 930; // 9:30 to 3:30
+  const ref = getReferenceData();
+  const snap11Visible = mins >= 660;
+  const snap130Visible = mins >= 810;
 
-    function setColorByNumber(id, value, neutral = false) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.classList.remove('green', 'red', 'amber');
-      if (!isNumeric(value)) {
-        el.classList.add('amber');
-        return;
-      }
-      if (neutral) return;
-      if (value > 0) el.classList.add('green');
-      if (value < 0) el.classList.add('red');
-    }
+  setText("pcr", fmtNum(data.current.pcr));
+  setText("vix", fmtNum(data.current.vix));
 
-    function render() {
-      const now = getIstNow();
-      const mins = now.hour * 60 + now.minute;
-      const isSession = mins >= 570 && mins <= 930;   // 9:30 to 15:30
-      const isAfter330 = mins >= 930;                 // 15:30 onward
+  document.getElementById("openingContent").innerHTML = isOpeningVisible
+    ? `
+      <div>
+        <div class="row"><span>Open</span><strong>${fmtNum(data.opening15m.open)}</strong></div>
+        <div class="row"><span>High</span><strong>${fmtNum(data.opening15m.high)}</strong></div>
+      </div>
+      <div>
+        <div class="row"><span>Low</span><strong>${fmtNum(data.opening15m.low)}</strong></div>
+        <div class="row"><span>Close</span><strong>${fmtNum(data.opening15m.close)}</strong></div>
+      </div>
+    `
+    : `<div class="muted">Market Closed</div>`;
 
-      document.getElementById('metaLine').textContent =
-        `IST ${String(now.day).padStart(2,'0')}/${String(now.month).padStart(2,'0')}/${now.year} ${String(now.hour).padStart(2,'0')}:${String(now.minute).padStart(2,'0')}:${String(now.second).padStart(2,'0')}`;
+  setText("pdh", fmtNum(ref.pdh));
+  setText("pdl", fmtNum(ref.pdl));
+  setText("pdClose", fmtNum(ref.pdClose));
+  setText("fii", fmtNum(ref.fii));
+  setText("dii", fmtNum(ref.dii));
+  setText("refDate", ref.date || ref.label);
 
-      // live
-      setText('pcr', data.current.pcr);
-      setText('vix', data.current.vix);
-      setColorByNumber('pcr', data.current.pcr - 1, true);
-      setColorByNumber('vix', data.current.vix, true);
+  document.getElementById("snap11").innerHTML = makeSnapshotHTML("11:00 AM", data.snapshots["11:00"], snap11Visible);
+  document.getElementById("snap130").innerHTML = makeSnapshotHTML("1:30 PM", data.snapshots["13:30"], snap130Visible);
 
-      // opening block visibility
-      document.getElementById('openingCard').classList.toggle('hide', !isSession);
-      document.getElementById('openingClosedCard').classList.toggle('hide', isSession);
-      setText('open', data.opening15m.open);
-      setText('openHigh', data.opening15m.high);
-      setText('openLow', data.opening15m.low);
-      setText('openClose', data.opening15m.close);
+  const structure = computeStructureEngine(data.structureCandles930to1100);
+  setText("bigCandle", fmtNum(structure.maxBody));
+  setText("sameColor", structure.sameColor);
+  setText("overlap", structure.overlap);
 
-      // daily reference
-      const ref = isAfter330 ? data.todayEod : data.previousTradingDay;
-      document.getElementById('dailyMode').textContent = isAfter330
-        ? 'Using today values from 3:30 PM onward. If source is not updated yet, status stays Updating...'
-        : 'Using previous trading day values before 3:30 PM';
+  const pdhNum = Number(ref.pdh);
+  const pdlNum = Number(ref.pdl);
+  const och = data.opening15m.high;
+  const ocl = data.opening15m.low;
 
-      setText('pdh', ref.pdh);
-      setText('pdl', ref.pdl);
-      setText('pdClose', ref.pdClose);
-      setText('fiiNet', ref.fiiNet);
-      setText('diiNet', ref.diiNet);
+  const pdhConfirm = Number.isFinite(pdhNum)
+    ? levelConfirmation(data.structureCandles930to1100, pdhNum, "above")
+    : {status:"Updating...", time:"--"};
 
-      // snapshots
-      setText('nifty11', data.snapshots['11:00'].nifty);
-      setText('vwapMid11', data.snapshots['11:00'].vwapMid);
-      setText('vwapUpper11', data.snapshots['11:00'].vwapUpper);
-      setText('vwapLower11', data.snapshots['11:00'].vwapLower);
+  const pdlConfirm = Number.isFinite(pdlNum)
+    ? levelConfirmation(data.structureCandles930to1100, pdlNum, "below")
+    : {status:"Updating...", time:"--"};
 
-      setText('nifty130', data.snapshots['13:30'].nifty);
-      setText('vwapMid130', data.snapshots['13:30'].vwapMid);
-      setText('vwapUpper130', data.snapshots['13:30'].vwapUpper);
-      setText('vwapLower130', data.snapshots['13:30'].vwapLower);
+  const ochConfirm = levelConfirmation(data.structureCandles930to1100, och, "above");
+  const oclConfirm = levelConfirmation(data.structureCandles930to1100, ocl, "below");
 
-      // interpretation
-      const livePrice = isNumeric(data.snapshots['13:30'].nifty)
-        ? data.snapshots['13:30'].nifty
-        : data.snapshots['11:00'].nifty;
-      const refPdh = ref.pdh;
-      const refPdl = ref.pdl;
-      const pcr = data.current.pcr;
-      const fii = String(ref.fiiNet || '');
-      const dii = String(ref.diiNet || '');
+  const pdhLiquidity = Number.isFinite(pdhNum)
+    ? liquidityStatus(data.structureCandles930to1100, pdhNum, "PDH", 15)
+    : {status:"Updating...", time:"--"};
 
-      let structure = 'Inside Range';
-      if (isNumeric(livePrice) && isNumeric(refPdh) && livePrice > refPdh) structure = 'Above PDH';
-      else if (isNumeric(livePrice) && isNumeric(refPdl) && livePrice < refPdl) structure = 'Below PDL';
+  const pdlLiquidity = Number.isFinite(pdlNum)
+    ? liquidityStatus(data.structureCandles930to1100, pdlNum, "PDL", 15)
+    : {status:"Updating...", time:"--"};
 
-      let participation = 'Neutral';
-      if (isNumeric(pcr) && pcr > 1.2) participation = 'Bullish';
-      else if (isNumeric(pcr) && pcr < 0.8) participation = 'Bearish';
+  const ochLiquidity = liquidityStatus(data.structureCandles930to1100, och, "PDH", 15);
+  const oclLiquidity = liquidityStatus(data.structureCandles930to1100, ocl, "PDL", 15);
 
-      let flow = 'Updating';
-      if (!fii.includes('Updating') && !dii.includes('Updating')) {
-        flow = `FII ${fii} | DII ${dii}`;
-      }
+  const pdhTriggerText = triggerLine(pdhConfirm);
+  decorateRowValue("pdhTrigger", pdhTriggerText);
+  applySignalClass("rowPdhTrigger", pdhTriggerText);
+  const pdlTriggerText = triggerLine(pdlConfirm);
+  decorateRowValue("pdlTrigger", pdlTriggerText);
+  applySignalClass("rowPdlTrigger", pdlTriggerText);
+  const ochTriggerText = triggerLine(ochConfirm);
+  decorateRowValue("ochTrigger", ochTriggerText);
+  applySignalClass("rowOchTrigger", ochTriggerText);
+  const oclTriggerText = triggerLine(oclConfirm);
+  decorateRowValue("oclTrigger", oclTriggerText);
+  applySignalClass("rowOclTrigger", oclTriggerText);
 
-      let vwapRead = 'Mixed';
-      const n11 = data.snapshots['11:00'].nifty;
-      const m11 = data.snapshots['11:00'].vwapMid;
-      const n130 = data.snapshots['13:30'].nifty;
-      const m130 = data.snapshots['13:30'].vwapMid;
-      if (isNumeric(n11) && isNumeric(m11) && isNumeric(n130) && isNumeric(m130)) {
-        if (n11 > m11 && n130 > m130) vwapRead = 'Above VWAP at both checkpoints';
-        else if (n11 < m11 && n130 < m130) vwapRead = 'Below VWAP at both checkpoints';
-        else if (n11 > m11 && n130 < m130) vwapRead = 'Morning strength weakened by 1:30 PM';
-        else if (n11 < m11 && n130 > m130) vwapRead = 'Morning weakness reversed by 1:30 PM';
-      }
+  const pdRangePos = getPdRangePosition(data.current.currentPrice, ref);
+  const openingRangePos = getOpeningRangePosition(data.current.currentPrice, data.opening15m);
+  const openingRangeStatus = getOpeningRangeStatus(data.current.currentPrice, data.opening15m, ochConfirm, oclConfirm);
+  const vwapPos = getVwapPosition(data.current.currentPrice, snap130Visible ? data.snapshots["13:30"] : null, snap11Visible ? data.snapshots["11:00"] : null);
 
-      document.getElementById('interpretation').innerHTML =
-        `<strong>Structure:</strong> ${structure}<br>` +
-        `<strong>Participation:</strong> ${participation} (PCR)<br>` +
-        `<strong>Volatility:</strong> India VIX ${formatNumber(data.current.vix)}<br>` +
-        `<strong>VWAP Read:</strong> ${vwapRead}<br>` +
-        `<strong>Flow:</strong> ${flow}`;
-    }
+  decorateRowValue("pdRangePos", pdRangePos);
+  decorateRowValue("openingRangePos", openingRangePos);
+  decorateRowValue("openingRangeStatus", openingRangeStatus);
+  decorateRowValue("vwapPos", vwapPos);
+  decorateRowValue("pdhStatus", pdhConfirm.status + (pdhConfirm.time !== "--" ? " @ " + pdhConfirm.time : ""));
+  decorateRowValue("pdlStatus", pdlConfirm.status + (pdlConfirm.time !== "--" ? " @ " + pdlConfirm.time : ""));
+  decorateRowValue("ochStatus", ochConfirm.status + (ochConfirm.time !== "--" ? " @ " + ochConfirm.time : ""));
+  decorateRowValue("oclStatus", oclConfirm.status + (oclConfirm.time !== "--" ? " @ " + oclConfirm.time : ""));
+  const biasText = vwapPos.includes("Above") ? "Bullish Lean" :
+    vwapPos.includes("Below") ? "Bearish Lean" : "Neutral";
+  decorateRowValue("bias", biasText);
+  decorateRowValue("heroBias", biasText);
+  applySignalClass("rowPdRange", pdRangePos);
+  applySignalClass("rowOpeningRange", openingRangePos);
+  applySignalClass("rowOpeningStatus", openingRangeStatus);
+  applySignalClass("rowVwap", vwapPos);
+  applySignalClass("rowPdhStatus", pdhConfirm.status);
+  applySignalClass("rowPdlStatus", pdlConfirm.status);
+  applySignalClass("rowOchStatus", ochConfirm.status);
+  applySignalClass("rowOclStatus", oclConfirm.status);
+  applySignalClass("rowBias", biasText);
 
-    render();
-    setInterval(render, 1000);
-  </script>
+  decorateRowValue("pdhLiquidity", pdhLiquidity.status);
+  applySignalClass("rowPdhLiquidity", pdhLiquidity.status);
+  setText("pdhGrabTime", fmtTime(pdhLiquidity.time));
+  decorateRowValue("pdlLiquidity", pdlLiquidity.status);
+  applySignalClass("rowPdlLiquidity", pdlLiquidity.status);
+  setText("pdlGrabTime", fmtTime(pdlLiquidity.time));
+  decorateRowValue("ochLiquidity", ochLiquidity.status);
+  applySignalClass("rowOchLiquidity", ochLiquidity.status);
+  setText("ochGrabTime", fmtTime(ochLiquidity.time));
+  decorateRowValue("oclLiquidity", oclLiquidity.status);
+  applySignalClass("rowOclLiquidity", oclLiquidity.status);
+  setText("oclGrabTime", fmtTime(oclLiquidity.time));
+
+  const finalCtx = {
+    pdRangePos,
+    openingRangePos,
+    openingRangeStatus,
+    vwapPos,
+    pdhConfirm,
+    pdlConfirm,
+    pdhLiquidity,
+    pdlLiquidity,
+    ochLiquidity,
+    oclLiquidity
+  };
+
+  const finalDecision = buildDecisionEngine(finalCtx);
+  decorateRowValue("decision", finalDecision.decision);
+  setDecisionBanner(finalDecision.decision);
+  setText("decisionSub", finalDecision.sub);
+
+  const tags = document.getElementById("tags");
+  tags.innerHTML = finalDecision.tags.map(t => `<span class="pill">${t}</span>`).join("");
+}
+
+render();
+</script>
 </body>
 </html>
